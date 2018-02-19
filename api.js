@@ -29,6 +29,7 @@ const {
   deletePainting,
   updatePainting,
   listPaintings,
+  limitPaintings,
   addArtist,
   getArtist,
   deleteArtist,
@@ -106,7 +107,7 @@ app.post('/paintings', function(req, res, next) {
   }
   addPainting(req.body)
     .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-    .catch(err => next(new HTTPError(err.status, err.message, err)))
+    .catch(errNextr(next))
 })
 ////////////////////////////////////////////////////////////////////////
 //
@@ -116,11 +117,11 @@ app.post('/paintings', function(req, res, next) {
 app.post('/artists', function(req, res, next) {
   const missingfields = paintingRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
-    next(new HTTPError(err.status, err.message, err))
+    next(errNextr(next))
   }
   addArtist(req.body)
     .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-    .catch(err => next(new HTTPError(err.status, err.message, err)))
+    .catch(errNextr(next))
 })
 ////////////////////////////////////////////////////////////////////////
 //
@@ -169,10 +170,26 @@ app.delete('/paintings/{id}', (req, res, next) =>
 )
 //////////////////////////////////////////////////////////////////////
 //
+//                    LIST LIMIT  5 PAINTINGS
+//
+//////////////////////////////////////////////////////////////////////
+app.get('/paintings', (req, res, next) => {
+  limitPaintings({
+    include_docs: true,
+    start_key: 'paitings_',
+    end_key: 'paintings_\ufff0',
+    limit: 5
+  })
+    .then(docFilter(req, res))
+    .catch(err => errNextr(next))
+})
+
+//////////////////////////////////////////////////////////////////////
+//
 //                    LIST 5 PAINTINGS BY NAME
 //
 //////////////////////////////////////////////////////////////////////
-// app.get('/paintings', (req, res, next) => {
+
 //   const limit = {}
 //   if (pathOr(null, ['query', 'limit'], req)) {
 //     const searchProp = head(split(':', req.query.limit))

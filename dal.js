@@ -35,6 +35,18 @@ const addDoc = doc => db.put(doc)
 const updatePainting = painting => db.put(painting)
 //DELETE A PAINTING
 const deletePainting = id => db.get(id).then(painting => db.remove(painting))
+//LIST LIMIT 5 PAINTINGS
+const limitPaintings = options => db.allDocs(options)
+// id => db.allDocs(id){
+//   include_docs: true,
+//   startkey: 'paintings_',
+//   endkey: 'paintings_\ufff0',
+//   limit: 10
+// }).then(function (result) {
+//   // handle result
+// }).catch(function (err) {
+//   console.log(err);
+// });
 
 //FILTER PAINTINGS
 const findDocs = query => db.find(query).then(result => result.docs)
@@ -77,5 +89,6 @@ module.exports = {
   getArtist,
   deleteArtist,
   updateArtist,
-  listArtists
+  listArtists,
+  limitPaintings
 }

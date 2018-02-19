@@ -67,39 +67,33 @@ db
     },
     {
       _id: 'artist_vincent van gogh',
-      type: 'painting',
-      movement: 'post-impressionism',
-      artist: 'Vincent van Gogh'
+      artist: 'Vincent van Gogh',
+      movement: 'post-impressionism'
     },
     {
       _id: 'artist_claude monet',
-      type: 'painting',
-      movement: 'impressionism',
-      artist: 'Claude Monet'
+      artist: 'Claude Monet',
+      movement: 'impressionism'
     },
     {
       _id: 'artist_leonardo da vinci',
-      type: 'painting',
-      movement: 'Renaissance',
-      artist: 'Leonardo da Vinci'
+      artist: 'Leonardo da Vinci',
+      movement: 'Renaissance'
     },
     {
       _id: 'artist_georges seurat',
-      type: 'painting',
-      movement: 'impressionism',
-      artist: 'Georges Seurat'
+      artist: 'Georges Seurat',
+      movement: 'impressionism'
     },
     {
       _id: 'artist_pablo picasso',
-      type: 'painting',
-      movement: 'surrealism',
-      artist: 'Pablo Picasso'
+      artist: 'Pablo Picasso',
+      movement: 'surrealism'
     },
     {
       _id: 'artist_pierre-auguste renoires',
-      type: 'painting',
-      movement: 'impressionism',
-      artist: 'Pierre-Auguste Renoires'
+      artist: 'Pierre-Auguste Renoires',
+      movement: 'impressionism'
     }
   ])
   .then(result => console.log('bulkDocs success!', result))
