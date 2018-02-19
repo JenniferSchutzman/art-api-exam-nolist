@@ -183,7 +183,6 @@ app.get('/paintings', (req, res, next) => {
     .then(paintings => res.send(paintings))
     .catch(err => errNextr(next))
 })
-
 //////////////////////////////////////////////////////////////////////
 //
 //                    FILTER PAINTINGS BY NAME & LIMIT TO 5
@@ -191,37 +190,37 @@ app.get('/paintings', (req, res, next) => {
 //////////////////////////////////////////////////////////////////////
 //First create index in another and db.find in another folder
 //then bring in with error handling and get
-// app.get('/paintings', (req, res, next) => {
-//   var query = {}
-//   if (pathOr(null, ['query', 'filter'], req)) {
-//     const propKey = head(split(':', req.query.filter))
-//     const propValue = last(split(':', req.query.filter))
-//     var selectorStuff = {}
-//     selectorStuff[propKey] = propValue
-//     query = {
-//       selector: selectorStuff
-//     }
-//   } else {
-//     query = {
-//       selector: { type: 'painting' },
-//       fields: [
-//         '_id',
-//         '_rev',
-//         'name',
-//         'type',
-//         'movement',
-//         'artist',
-//         'yearCreated',
-//         'museum'
-//       ],
-//       sort: ['name'],
-//       limit: 5
-//     }
-//   }
-//   findDocs(query)
-//     .then(docs => res.send(docs))
-//     .catch(errNextr(next))
-// })
+app.get('/paintings', (req, res, next) => {
+  var query = {}
+  if (pathOr(null, ['query', 'filter'], req)) {
+    const propKey = head(split(':', req.query.filter))
+    const propValue = last(split(':', req.query.filter))
+    var selectorStuff = {}
+    selectorStuff[propKey] = propValue
+    query = {
+      selector: selectorStuff
+    }
+  } else {
+    query = {
+      selector: { type: 'painting' },
+      fields: [
+        '_id',
+        '_rev',
+        'name',
+        'type',
+        'movement',
+        'artist',
+        'yearCreated',
+        'museum'
+      ],
+      sort: ['name'],
+      limit: 5
+    }
+  }
+  findDocs(query)
+    .then(docs => res.send(docs))
+    .catch(errNextr(next))
+})
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
