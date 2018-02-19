@@ -34,7 +34,8 @@ const {
   getArtist,
   deleteArtist,
   updateArtist,
-  listArtists
+  listArtists,
+  allPaintings
 } = require('./dal')
 const port = propOr(9999, 'PORT', process.env)
 const errNextr = next => err =>
@@ -79,12 +80,22 @@ const putArtistRequiredFieldChecker = reqFieldChecker([
 app.get('/', function(req, res, next) {
   res.send('Welcome to the Art API. Manage all the paintings for much win.')
 })
-
+////////////////////////////////////////////////////////////////////////
+//
+//                      SEE ALL PAINTINGS
+//
+////////////////////////////////////////////////////////////////////////
+app.get('/paintings', (req, res, next) => {
+  allPaintings({ include_docs: true }).then(artists =>
+    res.send(artists).catch(err => next(new HTTPError()))
+  )
+})
 ////////////////////////////////////////////////////////////////////////
 //
 //                      CREATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
+
 app.post('/paintings', function(req, res, next) {
   const missingfields = paintingRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
@@ -168,33 +179,28 @@ app.get('/paintings', (req, res, next) => {
     .then(paintings => res.send(paintings))
     .catch(err => errNextr(next))
 })
+
 //////////////////////////////////////////////////////////////////////
 //
 //                    FILTER PAINTINGS BY NAME & LIMIT TO 5
 //
 //////////////////////////////////////////////////////////////////////
-//First create index in another and db.find in another folder
-//then bring in with error handling and get
 app.get('/paintings', (req, res, next) => {
-  var query = {}
-  if (pathOr(null, ['query', 'filter'], req)) {
-    const propKey = head(split(':', req.query.filter))
-    const propValue = last(split(':', req.query.filter))
-    var selectorStuff = {}
-    selectorStuff[propKey] = propValue
-    query = {
-      selector: selectorStuff
-    }
-  } else {
-    query = {
-      selector: { type: 'painting' }
-    }
-  }
-  findDocs(query)
-    .then(docs => res.send(docs))
-    .catch(errNextr(next))
+  const filter = pathOr(null, ['query', 'filter'], req)
+
+  limitPaintings(
+    {
+      include_docs: true,
+      startkey: 'painting_',
+      endkey: 'painting_\ufff0',
+      limit: 5
+    },
+    filter
+  )
+    .then(paintings => res.send(paintings))
+    .catch(err => errNextr(next))
 })
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
 ///////////////////////////////////////////////////////////////////////

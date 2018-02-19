@@ -114,7 +114,7 @@ Paintings can be used to access a list of all of the paintings.
 Paintings ID can be used to retrieve a particular painting, update a painting, or delete a painting. Just remember that when you wish to update or delete a painting, it will also require the most recent rev so be sure to retrieve the document just before completing the subsequent actions.
 
 ```
-/paintings/searchFilter?=<propValue>:<searchValue>
+/paintings?filter=<searchProp>:<searchValue>
 ```
 
 Paintings searchFilter can be used to run queries directly in the browser. Just be sure to insert the necessary key value pair for the query inside the <>
