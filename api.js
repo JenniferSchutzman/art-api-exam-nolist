@@ -79,27 +79,12 @@ const putArtistRequiredFieldChecker = reqFieldChecker([
 app.get('/', function(req, res, next) {
   res.send('Welcome to the Art API. Manage all the paintings for much win.')
 })
-////////////////////////////////////////////////////////////////////////
-//
-//                      SEE ALL DOCS
-//
-////////////////////////////////////////////////////////////////////////
-// app.get('/paintings', (req, res, next) => {
-//   listPaintings({ include_docs: true }).then(artists =>
-//     res.send(artists).catch(err => next(new HTTPError()))
-//   )
-// })
+
 ////////////////////////////////////////////////////////////////////////
 //
 //                      CREATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-
-// app.post('/paintings', function(req, res, next) {
-//   addPainting(req.body)
-//     .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-//     .catch(err => next(new HTTPError(err.status, err.message, err)))
-// })
 app.post('/paintings', function(req, res, next) {
   const missingfields = paintingRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
@@ -202,19 +187,7 @@ app.get('/paintings', (req, res, next) => {
     }
   } else {
     query = {
-      selector: { type: 'painting' },
-      fields: [
-        '_id',
-        '_rev',
-        'name',
-        'type',
-        'movement',
-        'artist',
-        'yearCreated',
-        'museum'
-      ],
-      sort: ['name'],
-      limit: 5
+      selector: { type: 'painting' }
     }
   }
   findDocs(query)
