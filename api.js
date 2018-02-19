@@ -80,6 +80,16 @@ app.get('/', function(req, res, next) {
 })
 ////////////////////////////////////////////////////////////////////////
 //
+//                      SEE ALL DOCS
+//
+////////////////////////////////////////////////////////////////////////
+app.get('/paintings', (req, res, next) => {
+  listPaintings({ include_docs: true }).then(artists =>
+    res.send(artists).catch(err => next(new HTTPError()))
+  )
+})
+////////////////////////////////////////////////////////////////////////
+//
 //                      CREATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
@@ -103,12 +113,6 @@ app.post('/paintings', function(req, res, next) {
 //                      CREATE AN ARTIST
 //
 ////////////////////////////////////////////////////////////////////////
-
-// app.post('/paintings', function(req, res, next) {
-//   addPainting(req.body)
-//     .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-//     .catch(err => next(new HTTPError(err.status, err.message, err)))
-// })
 app.post('/artists', function(req, res, next) {
   const missingfields = paintingRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
@@ -123,7 +127,7 @@ app.post('/artists', function(req, res, next) {
 //                      RETRIEVE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.get('/paintings/:id', (req, res, next) =>
+app.get('/paintings/{id}', (req, res, next) =>
   getPainting(req.params.id)
     .then(painting => res.send(painting))
     .catch(errNextr(next))
@@ -133,7 +137,7 @@ app.get('/paintings/:id', (req, res, next) =>
 //                      UPDATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.put('/paintings/:id', (req, res, next) => {
+app.put('/paintings/{id}', (req, res, next) => {
   const bodyCleaner = objClean(
     '_id',
     '_rev',
@@ -158,49 +162,68 @@ app.put('/paintings/:id', (req, res, next) => {
 //                     DELETE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.delete('/paintings/:id', (req, res, next) =>
+app.delete('/paintings/{id}', (req, res, next) =>
   deletePainting(req.params.id)
     .then(deletedResult => res.send(deletedResult))
     .catch(err => next(new HTTPError(err.status, err.message, err)))
 )
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 //
-//                     LIST PAINTINGS
+//                    LIST 5 PAINTINGS BY NAME
 //
-////////////////////////////////////////////////////////////////////////
-app.get('/paintings', (req, res, next) => {
-  listPaintings({ include_docs: true }).then(paintings =>
-    res.send(paintings).catch(err => next(new HTTPError()))
-  )
-})
-
-//OR
-
+//////////////////////////////////////////////////////////////////////
+// app.get('/paintings', (req, res, next) => {
+//   const limit = {}
+//   if (pathOr(null, ['query', 'limit'], req)) {
+//     const searchProp = head(split(':', req.query.limit))
+//     const searchValue = last(split(':', req.query.limit))
+//     limit = doc =>
+//       res.status(200).send(filter(doc => doc[searchProp] == searchValue))
+//   } else {
+//     res.send(paintings)
+//   }
+//   const fiveMax = n =>
+//     db.find({
+//       selector: { type: 'painting' },
+//       fields: [
+//         '_id',
+//         '_rev',
+//         'name',
+//         'type',
+//         'movement',
+//         'artist',
+//         'yearCreated',
+//         'museum'
+//       ],
+//       sort: ['name'],
+//       limit: 5
+//     })
+//   allDocs(fiveMax).then(searchFilter(req, res).catch(err => errNextr(next)))
+// })
 ////////////////////////////////////////////////////////////////////////
 //
 //                     FILTER PAINTINGS
 //
 ////////////////////////////////////////////////////////////////////////
-// app.get('/paintings', (req, res, next) => {
-//   var searchFilter = {}
-//   if (pathOr(null, ['query', 'searchFilter'], req)) {
-//     const searchProp = head(split(':', req.query.searchFilter))
-//     const searchValue = last(split(':', req.query.searchFilter))
-//     searchFilter = doc =>
-//       res.status(200).send(filter(doc => doc[searchProp] == searchValue))
-//   } else {
-//     res.send(paintings)
-//   }
-//   const options = {
-//     include_docs: true,
-//     start_key: 'paintings_',
-//     end_key: 'paintings_\ufff0'
-//   }
-//   findDocs(searchFilter)
-//     .then((docs = res.send(docs)))
-//     .catch(errNextr(next))
-// })
-
+app.get('/paintings', (req, res, next) => {
+  var searchFilter = {}
+  if (pathOr(null, ['query', 'searchFilter'], req)) {
+    const searchProp = head(split(':', req.query.searchFilter))
+    const searchValue = last(split(':', req.query.searchFilter))
+    searchFilter = doc =>
+      res.status(200).send(filter(doc => doc[searchProp] == searchValue))
+  } else {
+    res.send(paintings)
+  }
+  const options = {
+    include_docs: true,
+    start_key: 'paintings_',
+    end_key: 'paintings_\ufff0'
+  }
+  findDocs(searchFilter)
+    .then((docs = res.send(docs)))
+    .catch(errNextr(next))
+})
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
@@ -212,7 +235,6 @@ app.get('/paintings', (req, res, next) => {
 //                      CREATE AN ARTIST
 //
 ////////////////////////////////////////////////////////////////////////
-
 app.post('/artists', function(req, res, next) {
   const missingfields = artistRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
@@ -227,7 +249,7 @@ app.post('/artists', function(req, res, next) {
 //                      RETRIEVE AN ARTIST
 //
 ////////////////////////////////////////////////////////////////////////
-app.get('/artists/:id', (req, res, next) =>
+app.get('/artists/{id}', (req, res, next) =>
   getArtist(req.params.id)
     .then(artist => res.send(artist))
     .catch(errNextr(next))
@@ -237,7 +259,7 @@ app.get('/artists/:id', (req, res, next) =>
 //                      UPDATE AN ARTIST
 //
 ////////////////////////////////////////////////////////////////////////
-app.put('/artists/:id', (req, res, next) => {
+app.put('/artists/{id}', (req, res, next) => {
   const bodyCleaner = objClean('_id', '_rev', 'movement', 'artist', 'type')
   const readyArtist = bodyCleaner(req.body)
   const cleanArtist = putArtistRequiredFieldChecker(readyArtist)
@@ -253,14 +275,14 @@ app.put('/artists/:id', (req, res, next) => {
 //                     DELETE AN ARTIST
 //
 ////////////////////////////////////////////////////////////////////////
-app.delete('/artists/:id', (req, res, next) =>
+app.delete('/artists/{id}', (req, res, next) =>
   deleteArtist(req.params.id)
     .then(deletedResult => res.send(deletedResult))
     .catch(err => next(new HTTPError(err.status, err.message, err)))
 )
 ////////////////////////////////////////////////////////////////////////
 //
-//                     LIST ARTISTS
+//                     SEE ALL ARTISTS
 //
 ////////////////////////////////////////////////////////////////////////
 app.get('/artists', (req, res, next) => {
@@ -268,31 +290,6 @@ app.get('/artists', (req, res, next) => {
     res.send(artists).catch(err => next(new HTTPError()))
   )
 })
-
-////////////////////////////////////////////////////////////////////////
-//
-//                     FILTER ARTISTS
-//
-////////////////////////////////////////////////////////////////////////
-// app.get('/artists', (req, res, next) => {
-//   var searchFilter = {}
-//   if (pathOr(null, ['query', 'searchFilter'], req)) {
-//     const searchProp = head(split(':', req.query.searchFilter))
-//     const searchValue = last(split(':', req.query.searchFilter))
-//     searchFilter = doc =>
-//       res.status(200).send(filter(doc => doc[searchProp] == searchValue))
-//   } else {
-//     res.send(artists)
-//   }
-//   const options = {
-//     include_docs: true,
-//     start_key: 'artists_',
-//     end_key: 'artists_\ufff0'
-//   }
-//   findDocs(searchFilter)
-//     .then((docs = res.send(docs)))
-//     .catch(errNextr(next))
-// })
 ///////////////////////////////////////////////////////////////////////
 //
 //                      ERROR HANDLER

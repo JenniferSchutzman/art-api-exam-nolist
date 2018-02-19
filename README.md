@@ -31,7 +31,11 @@ This first section is "Getting Started" but if you are already up and running, m
     //
     ////////////////////////////////////////////////////////////////////////////
 
-19. CREATE A DATABASE
+```
+open terminal
+```
+
+1. CREATE A DATABASE
 
 Use the terminal to create a roo database with the following command:
 
@@ -83,7 +87,11 @@ In the terminal, enter node api.js to begin run the portal. Refresh both your po
 
 7. MAKE YOUR FIRST GET
 
-After activating the port in the terminal, go to http://localhost:4000 to be receive the message "Welcome to the Art API. Manage all the paintings for much win."
+After activating the port in the terminal, go to http://localhost:4000 to be receive the message "Welcome to the Art API. Manage all the paintings for much win." If you wish to run a specific GET on an all of the paintings, complete the following:
+a. open Postman
+b. select GET in the left-hand dropdown
+c. copy and paste your localhost url
+d. send
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -147,7 +155,7 @@ With this particular API, common error causes include the following:
 a. You will receive a 409 conflict when you do not follow the required fields rules laid out in the beginning of the api.js file. For example, if you have listed the artist's home origin instead of their "movement", the POST or PUT will be rejected because it does not contain the proper fields.
 b. You will receive a 404 if the capitalization or syntax differs in the slightest from the strict format of the existing objects.
 
-I hope you enjoy this project as much as I have and feel free to contact me with any questions at jennifer.schutzman@gmail.com for further guidance.
+Contact me with any questions at jennifer.schutzman@gmail.com for further guidance.
 
 ```
 
