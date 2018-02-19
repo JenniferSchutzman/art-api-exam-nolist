@@ -23,7 +23,7 @@ app.use(bodyParser.json())
 ////////////////////////////////////////////////////////////////////////
 const {
   allDocs,
-  // findDocs,
+  findDocs,
   addPainting,
   getPainting,
   deletePainting,
@@ -84,11 +84,11 @@ app.get('/', function(req, res, next) {
 //                      SEE ALL DOCS
 //
 ////////////////////////////////////////////////////////////////////////
-app.get('/paintings', (req, res, next) => {
-  listPaintings({ include_docs: true }).then(artists =>
-    res.send(artists).catch(err => next(new HTTPError()))
-  )
-})
+// app.get('/paintings', (req, res, next) => {
+//   listPaintings({ include_docs: true }).then(artists =>
+//     res.send(artists).catch(err => next(new HTTPError()))
+//   )
+// })
 ////////////////////////////////////////////////////////////////////////
 //
 //                      CREATE A PAINTING
@@ -176,31 +176,33 @@ app.delete('/paintings/{id}', (req, res, next) =>
 app.get('/paintings', (req, res, next) => {
   limitPaintings({
     include_docs: true,
-    start_key: 'paitings_',
-    end_key: 'paintings_\ufff0',
+    startkey: 'painting_',
+    endkey: 'painting_\ufff0',
     limit: 5
   })
-    .then(docFilter(req, res))
+    .then(paintings => res.send(paintings))
     .catch(err => errNextr(next))
 })
 
 //////////////////////////////////////////////////////////////////////
 //
-//                    LIST 5 PAINTINGS BY NAME
+//                    FILTER PAINTINGS BY NAME & LIMIT TO 5
 //
 //////////////////////////////////////////////////////////////////////
-
-//   const limit = {}
-//   if (pathOr(null, ['query', 'limit'], req)) {
-//     const searchProp = head(split(':', req.query.limit))
-//     const searchValue = last(split(':', req.query.limit))
-//     limit = doc =>
-//       res.status(200).send(filter(doc => doc[searchProp] == searchValue))
+//First create index in another and db.find in another folder
+//then bring in with error handling and get
+// app.get('/paintings', (req, res, next) => {
+//   var query = {}
+//   if (pathOr(null, ['query', 'filter'], req)) {
+//     const propKey = head(split(':', req.query.filter))
+//     const propValue = last(split(':', req.query.filter))
+//     var selectorStuff = {}
+//     selectorStuff[propKey] = propValue
+//     query = {
+//       selector: selectorStuff
+//     }
 //   } else {
-//     res.send(paintings)
-//   }
-//   const fiveMax = n =>
-//     db.find({
+//     query = {
 //       selector: { type: 'painting' },
 //       fields: [
 //         '_id',
@@ -214,33 +216,12 @@ app.get('/paintings', (req, res, next) => {
 //       ],
 //       sort: ['name'],
 //       limit: 5
-//     })
-//   allDocs(fiveMax).then(searchFilter(req, res).catch(err => errNextr(next)))
+//     }
+//   }
+//   findDocs(query)
+//     .then(docs => res.send(docs))
+//     .catch(errNextr(next))
 // })
-////////////////////////////////////////////////////////////////////////
-//
-//                     FILTER PAINTINGS
-//
-////////////////////////////////////////////////////////////////////////
-app.get('/paintings', (req, res, next) => {
-  var searchFilter = {}
-  if (pathOr(null, ['query', 'searchFilter'], req)) {
-    const searchProp = head(split(':', req.query.searchFilter))
-    const searchValue = last(split(':', req.query.searchFilter))
-    searchFilter = doc =>
-      res.status(200).send(filter(doc => doc[searchProp] == searchValue))
-  } else {
-    res.send(paintings)
-  }
-  const options = {
-    include_docs: true,
-    start_key: 'paintings_',
-    end_key: 'paintings_\ufff0'
-  }
-  findDocs(searchFilter)
-    .then((docs = res.send(docs)))
-    .catch(errNextr(next))
-})
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
