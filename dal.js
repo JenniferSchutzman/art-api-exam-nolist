@@ -7,7 +7,7 @@ require('dotenv').config()
 const PouchDB = require('pouchdb-core')
 PouchDB.plugin(require('pouchdb-adapter-http'))
 const HTTPError = require('node-http-error')
-const { pluck, split, head, last, compose } = require('ramda')
+const { pluck, split, head, last, compose, filter } = require('ramda')
 const db = new PouchDB(process.env.COUCHDB_URL)
 const slugify = require('slugify')
 //console.log(process.env)
@@ -20,7 +20,7 @@ const slugify = require('slugify')
 const allDocs = options =>
   db.allDocs(options).then(docs => pluck('doc', docs.rows))
 //SEE ALL PAINTINGS
-const listPaintings = options =>
+const allPaintings = options =>
   db.allDocs(options).then(response => pluck('doc', response.rows))
 //GET A PAINTING
 const getPainting = id => db.get(id)
@@ -37,19 +37,21 @@ const updatePainting = painting => db.put(painting)
 const deletePainting = id => db.get(id).then(painting => db.remove(painting))
 //LIST LIMIT 5 PAINTINGS
 const limitPaintings = options => db.allDocs(options)
-// id => db.allDocs(id){
-//   include_docs: true,
-//   startkey: 'paintings_',
-//   endkey: 'paintings_\ufff0',
-//   limit: 10
-// }).then(function (result) {
-//   // handle result
-// }).catch(function (err) {
-//   console.log(err);
-// });
-
 //FILTER PAINTINGS
 const findDocs = query => db.find(query).then(result => result.docs)
+const listPaintings = (options, filterPainting) => {
+  if (filterPainting) {
+    const filterProp = head(split(':', req.query.filterPainting))
+    const filterValue = last(split(':', req.query.filterPainting))
+    const filterDocs = compose(
+      filter(doc => doc[filterProp] === filterValue),
+      pluck('doc')
+    )
+    return db.allDocs(options).then(response => filterDocs(response.rows))
+  } else {
+    return db.adllDocs(options).then(response => pluck('doc', response.rows))
+  }
+}
 /////////////////////////////////////////////////////////////////
 //
 //          CONSTS TO BE SENT TO THE API FOR THE ARTIST IDS
@@ -79,6 +81,7 @@ const listArtists = options =>
 
 module.exports = {
   allDocs,
+  allPaintings,
   findDocs,
   addPainting,
   getPainting,

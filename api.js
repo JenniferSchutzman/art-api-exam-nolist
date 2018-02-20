@@ -84,22 +84,16 @@ app.get('/', function(req, res, next) {
 //                      SEE ALL DOCS
 //
 ////////////////////////////////////////////////////////////////////////
-// app.get('/paintings', (req, res, next) => {
-//   listPaintings({ include_docs: true }).then(artists =>
-//     res.send(artists).catch(err => next(new HTTPError()))
-//   )
-// })
+app.get('/paintings', (req, res, next) => {
+  listPaintings({ include_docs: true }).then(artists =>
+    res.send(artists).catch(err => next(new HTTPError()))
+  )
+})
 ////////////////////////////////////////////////////////////////////////
 //
 //                      CREATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-
-// app.post('/paintings', function(req, res, next) {
-//   addPainting(req.body)
-//     .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-//     .catch(err => next(new HTTPError(err.status, err.message, err)))
-// })
 app.post('/paintings', function(req, res, next) {
   const missingfields = paintingRequiredFieldChecker(req.body)
   if (not(isEmpty(missingfields))) {
@@ -189,39 +183,21 @@ app.get('/paintings', (req, res, next) => {
 //                    FILTER PAINTINGS BY NAME & LIMIT TO 5
 //
 //////////////////////////////////////////////////////////////////////
-//First create index in another and db.find in another folder
-//then bring in with error handling and get
-// app.get('/paintings', (req, res, next) => {
-//   var query = {}
-//   if (pathOr(null, ['query', 'filter'], req)) {
-//     const propKey = head(split(':', req.query.filter))
-//     const propValue = last(split(':', req.query.filter))
-//     var selectorStuff = {}
-//     selectorStuff[propKey] = propValue
-//     query = {
-//       selector: selectorStuff
-//     }
-//   } else {
-//     query = {
-//       selector: { type: 'painting' },
-//       fields: [
-//         '_id',
-//         '_rev',
-//         'name',
-//         'type',
-//         'movement',
-//         'artist',
-//         'yearCreated',
-//         'museum'
-//       ],
-//       sort: ['name'],
-//       limit: 5
-//     }
-//   }
-//   findDocs(query)
-//     .then(docs => res.send(docs))
-//     .catch(errNextr(next))
-// })
+app.get('/paintings', (req, res, next) => {
+  const filter = pathOr(null, ['query', 'filter'], req)
+
+  limitPaintings(
+    {
+      include_docs: true,
+      startkey: 'painting_',
+      endkey: 'painting_\ufff0',
+      limit: 5
+    },
+    filter
+  )
+    .then(paintings => res.send(paintings))
+    .catch(err => errNextr(next))
+})
 ////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
