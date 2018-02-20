@@ -85,7 +85,7 @@ app.get('/', function(req, res, next) {
 //
 ////////////////////////////////////////////////////////////////////////
 app.get('/paintings', (req, res, next) => {
-  listPaintings({ include_docs: true }).then(artists =>
+  allDocs({ include_docs: true }).then(artists =>
     res.send(artists).catch(err => next(new HTTPError()))
   )
 })
@@ -105,24 +105,10 @@ app.post('/paintings', function(req, res, next) {
 })
 ////////////////////////////////////////////////////////////////////////
 //
-//                      CREATE AN ARTIST
-//
-////////////////////////////////////////////////////////////////////////
-app.post('/artists', function(req, res, next) {
-  const missingfields = paintingRequiredFieldChecker(req.body)
-  if (not(isEmpty(missingfields))) {
-    next(errNextr(next))
-  }
-  addArtist(req.body)
-    .then(addedPaintingResult => res.status(201).send(addedPaintingResult))
-    .catch(errNextr(next))
-})
-////////////////////////////////////////////////////////////////////////
-//
 //                      RETRIEVE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.get('/paintings/{id}', (req, res, next) =>
+app.get('/paintings/:id', (req, res, next) =>
   getPainting(req.params.id)
     .then(painting => res.send(painting))
     .catch(errNextr(next))
@@ -132,7 +118,7 @@ app.get('/paintings/{id}', (req, res, next) =>
 //                      UPDATE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.put('/paintings/{id}', (req, res, next) => {
+app.put('/paintings/id', (req, res, next) => {
   const bodyCleaner = objClean(
     '_id',
     '_rev',
@@ -157,7 +143,7 @@ app.put('/paintings/{id}', (req, res, next) => {
 //                     DELETE A PAINTING
 //
 ////////////////////////////////////////////////////////////////////////
-app.delete('/paintings/{id}', (req, res, next) =>
+app.delete('/paintings/:id', (req, res, next) =>
   deletePainting(req.params.id)
     .then(deletedResult => res.send(deletedResult))
     .catch(err => next(new HTTPError(err.status, err.message, err)))
@@ -198,11 +184,9 @@ app.get('/paintings', (req, res, next) => {
     .then(paintings => res.send(paintings))
     .catch(err => errNextr(next))
 })
-////////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////////////
 //             SWITCHING TO ARTIST CRUB BELOW
-///////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 //

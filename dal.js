@@ -49,7 +49,7 @@ const listPaintings = (options, filterPainting) => {
     )
     return db.allDocs(options).then(response => filterDocs(response.rows))
   } else {
-    return db.adllDocs(options).then(response => pluck('doc', response.rows))
+    return db.allDocs(options).then(response => pluck('doc', response.rows))
   }
 }
 /////////////////////////////////////////////////////////////////
